@@ -7,6 +7,7 @@ https://github.com/shu130/terraform-study32
 
 ```plaintext
 .
+├── image_digest.txt      # Dockerイメージのハッシュファイル(自動生成)
 ├── docker
 │   └── Dockerfile        # Lambda実行環境をDockerで定義
 ├── src
