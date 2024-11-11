@@ -1,0 +1,44 @@
+# Terraform files
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+*.tfplan
+*.backup
+
+# 秘密鍵（SSH鍵やその他の資格情報ファイルなど、もし管理している場合）
+*.pem
+*.key
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python virtual environment
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+venv/
+.env
+
+# ログファイル
+*.log
+
+# Docker files
+*.tar
+*.bak
+
+# Dockerイメージのハッシュファイル
+image_digest.txt
+
+# 自分用ノート
+_notes/
+
+# 採用しなかったファイル
+**/*.disable*
