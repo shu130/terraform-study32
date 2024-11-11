@@ -40,7 +40,7 @@ RUN pip install -r requirements.txt
 # アプリケーションコードの追加
 COPY src/app.py ${LAMBDA_TASK_ROOT}
 
-# Lambdaエントリーポイントの設定
+# Lambdaエントリーポイントの設定(app.pyのファイル名と関数名)
 CMD ["app.lambda_handler"]
 ```
 - `FROM public.ecr.aws/lambda/python:3.11`:   
@@ -72,11 +72,7 @@ requests==2.32.3
 ```
 - バージョンを指定しない場合はその時点の最新バージョンがインストールされる。
 - **`boto3`**:  
-  AWS SDKで、Lambdaから以下のような他のAWSサービスを操作するために使います。
-  - S3にデータを保存・取得
-  - DynamoDBのデータ操作
-  - CloudWatchへのメトリクス送信
-
+  AWS SDKで、AWSサービスを操作するために使います。
 - **`requests`**:  
   外部のAPIエンドポイントにHTTPリクエストを送るために使われます。
   - 外部APIからのデータ取得
@@ -98,7 +94,7 @@ from datetime import datetime #=>標準ライブラリ
 s3_client = boto3.client("s3")
 
 def lambda_handler(event, context):
-    # 1. 外部APIからデータを取得(今回はダミーデータを返す無料のAPIを使用する)
+    # 1. 外部APIからデータを取得(今回はダミーデータを返す無料のAPIを使用します)
     api_url = "https://jsonplaceholder.typicode.com/todos/1" #=> 外部APIのURL
     response = requests.get(api_url)
 
@@ -128,7 +124,7 @@ def lambda_handler(event, context):
         "body": json.dumps({"message": "Data successfully saved to S3", "file": file_name})
     }
 ```
-- **`os`**：環境変数を取得するためのPythonの標準ライブラリで、lamdba.tfのなかの環境変数(`S3_BUCKET_NAME`)を取得します。
+- **`os`**：環境変数を取得するためのPythonの標準ライブラリで、`lamdba.tf`のなかの環境変数(`S3_BUCKET_NAME`)を取得します。
 - **`json`**: Python標準ライブラリで、PythonのデータをJSON形式に変換したり、その逆の操作を行うために使用します。
 - **`boto3`**: AWS SDK for Pythonです。ここではS3クライアントを作成するために使用します。
 - **`requests`**: 外部APIにリクエストを送信するためのライブラリです。
@@ -140,7 +136,8 @@ def lambda_handler(event, context):
     例えば、API GatewayやS3のイベント通知で起動された場合、そのイベント情報が格納されます。
   - **`context`**: 実行環境に関する情報が格納されます。ログ出力やタイムアウト時間の取得などに使います。
 - **`requests.get(api_url)`**: 指定したURLにGETリクエストを送信します。
-- **`response.status_code`**: リクエストの結果として、ステータスコードを取得します。  
+- **`response.status_code`**:  
+  リクエストの結果として、ステータスコードを取得します。  
   200はリクエストが成功したことを示しています。
 - **`response.json()`**: レスポンスがJSON形式の場合、これでPythonの辞書型データに変換して取り出します。
 - **`bucket_name`**: データを保存するS3バケット名です。
@@ -175,7 +172,7 @@ resource "aws_ecr_repository" "python_lambda" {
 }
 ```
 
-## `./terraform/lambda.tf`
+## `./terraform/s3.tf`
 
 ### 1. S3バケット作成(Lambdaのアーティファクト用)
 
@@ -287,6 +284,8 @@ locals {
 
 ---
 
+## `./terraform/iam.tf`
+
 ### 3. Lambda IAMロールとポリシーの作成
 
 Lambda関数がS3とCloudWatch Logsにアクセスするために必要なIAMロールとポリシーを設定して、  
@@ -361,6 +360,8 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
 }
 ```
 ---
+
+## `./terraform/lambda.tf`
 
 ### 4. Lambda関数の作成
 
